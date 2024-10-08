@@ -1,0 +1,17 @@
+adafruit_bitmap_font==2.1.2
+adafruit_bus_device==5.2.9
+adafruit_connection_manager==3.1.1
+adafruit_datetime==1.2.7
+adafruit_display_text==3.1.2
+adafruit_esp32spi==8.4.0
+adafruit_fakerequests==1.0.14
+adafruit_io==5.9.0
+adafruit_matrixportal==3.2.0
+adafruit_minimqtt==7.10.2
+adafruit_miniqr==2.1.2
+adafruit_pixelbuf==2.0.5
+adafruit_portalbase==2.1.1
+adafruit_requests==4.1.6
+adafruit_ticks==1.1.0
+neopixel==6.3.11
+simpleio==3.0.13
