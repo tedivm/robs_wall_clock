@@ -38,11 +38,11 @@ class LifeSimple(Cell):
 
     @gc_decorator
     def reset(self, output):
-        self.palette[1] = colorwheel(random.randint(0, 255))
+        self.board.palette[1] = colorwheel(random.randint(0, 255))
         for i in range(output.height * output.width):
             output[i] = random.random() < self.random_grid_density
 
 
-def run(network, it, run_forever=False):
-    runner = LifeSimple(network, it, run_forever)
+def run(gameboard, run_forever=False):
+    runner = LifeSimple(gameboard, run_forever)
     runner.run()

@@ -5,7 +5,10 @@ from utils.memory import gc_decorator
 from utils.palette import BLACK
 
 
-class ColorLife(Cell):
+class ColorHighLife(Cell):
+    # https://conwaylife.com/wiki/OCA:HighLife
+
+    random_grid_density = 0.20
 
     # Function adapted from https://github.com/adafruit/Adafruit_Learning_System_Guides/blob/main/CircuitPython_RGBMatrix/life/code.py
     @gc_decorator
@@ -91,7 +94,11 @@ class ColorLife(Cell):
                     else:
                         neighbor_colors[color] = 1
 
-                if neighbor_count == 3 or (neighbor_count == 2 and int(old[x + yyy])):
+                if (
+                    (old[x + yyy] > 0 and neighbor_count == 2)
+                    or (neighbor_count == 3)
+                    or (neighbor_count == 6)
+                ):
                     living_cells += 1
                     if old[x + yyy]:
                         # If the cell is alive, keep the same color.
@@ -123,5 +130,5 @@ class ColorLife(Cell):
 
 
 def run(gameboard, run_forever=False):
-    runner = ColorLife(gameboard, run_forever)
+    runner = ColorHighLife(gameboard, run_forever)
     runner.run()

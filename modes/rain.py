@@ -2,6 +2,7 @@ import random
 
 from utils.cells import Cell
 from utils.memory import gc_decorator
+from utils.palette import BLACK, WHITE
 
 
 class Rain(Cell):
@@ -20,7 +21,7 @@ class Rain(Cell):
                         if self.one_color:
                             new[x + yyy] = self.color
                         else:
-                            new[x + yyy] = random.randint(1, self.max_colors - 1)
+                            new[x + yyy] = random.randint(1, self.board.max_colors - 1)
                     else:
                         new[x + yyy] = 0
                 else:
@@ -30,13 +31,28 @@ class Rain(Cell):
 
     @gc_decorator
     def reset(self, output):
+        print("Rain reset")
         self.one_color = random.random() < 0.5
         if self.one_color:
-            self.color = random.randint(1, self.max_colors - 1)
+            self.color = random.randint(1, self.board.max_colors - 1)
+            self.random_grid_density = random.randint(11, 66) / 100
+        else:
+            if random.random() < 0.5:
+                self.random_grid_density = random.randint(33, 55) / 100
+            else:
+                self.random_grid_density = 1
+
         for i in range(output.height * output.width):
             output[i] = 0
 
+        if self.random_grid_density == 1:
+            print("BLACK CLOCK")
+            self.board.set_clock_color(BLACK)
+        else:
+            print("WHITE CLOCK")
+            self.board.set_clock_color(WHITE)
 
-def run(network, it, run_forever=False):
-    runner = Rain(network, it, run_forever)
+
+def run(gameboard, run_forever=False):
+    runner = Rain(gameboard, run_forever)
     runner.run()

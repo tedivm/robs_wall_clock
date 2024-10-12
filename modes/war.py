@@ -26,8 +26,7 @@ class War(Cell):
             for x in range(width):
                 xp1 = (x + 1) % width
 
-                use_cell = random.randint(1, 8)
-                colors_active.add(old[x + yyy])
+                use_cell = random.randint(1, 9)
 
                 # Check all 8 neighbors.
                 # Although this is a bit verbose, it is faster than using loops or functions.
@@ -59,10 +58,11 @@ class War(Cell):
                 if use_cell == 9:
                     new[x + yyy] = old[x + yyy]
 
+                colors_active.add(new[x + yyy])
                 xm1 = x
         return len(colors_active) > 1
 
 
-def run(network, it, run_forever=False):
-    runner = War(network, it, run_forever)
+def run(gameboard, run_forever=False):
+    runner = War(gameboard, run_forever)
     runner.run()
