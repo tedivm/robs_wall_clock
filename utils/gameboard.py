@@ -10,7 +10,7 @@ from utils.palette import BLACK, WHITE, get_palette
 
 class GameBoard:
 
-    bit_depth = 2
+    bit_depth = 3
 
     def __init__(self, network, it, life_scale=1, max_colors=16, text_color=WHITE):
         logged_gc("Initializing Game Board")

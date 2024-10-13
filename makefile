@@ -17,5 +17,5 @@ upload:
 
 pull_from_device: freeze_deps
 	cp $(DEVICE_PATH)/code.py main.py
-	cp -r $(DEVICE_PATH)/modes modes
-	cp -r $(DEVICE_PATH)/utils utils
+	cp -r $(DEVICE_PATH)/modes ./
+	cp -r $(DEVICE_PATH)/utils ./

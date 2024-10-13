@@ -27,8 +27,15 @@ esp._debug = True
 
 print(f"Network Initialized, Free Memory: {gc.mem_free()}.")
 
+timezone = os.getenv("TIMEZONE", "America/Chicago")
+clock_update = int(os.getenv("CLOCK_INTERNET_UPDATE", 600))
 
-it = InternetTime(wifi, os.getenv("TIMEZONE", "America/Chicago"), debug=True)
+it = InternetTime(
+    wifi,
+    os.getenv("TIMEZONE", "America/Chicago"),
+    debug=True,
+    seconds_between_updates=clock_update,
+)
 
 
 GAMEBOARD = GameBoard(wifi, it)

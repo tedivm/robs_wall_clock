@@ -9,19 +9,19 @@ class Cell:
     text_color = WHITE
     random_grid_density = 0.33
     reset_every = 1
-    leave_after = 1
+    leave_after = 5
 
     def __init__(self, gameboard, run_forever=False):
         self.run_forever = run_forever
         self.board = gameboard
         self.reset(self.board.b1)
+        self.board.set_clock_color(self.text_color)
 
     @gc_decorator
     def run(self):
         generations = 0
         old_text = ""
         first_run = True
-        self.board.set_clock_color(self.text_color)
         while True:
             new_text = self.board.it.time_string()
             if new_text != old_text:
@@ -32,15 +32,16 @@ class Cell:
                 self.board.clock_label_2.text = new_text
 
                 if not first_run:
-                    last_digit = int(new_text[-2])
+                    print("Checking for game exit conditions.")
+                    last_digits = int(new_text[-2:])
 
                     # Leave this game to start another.
-                    if not self.run_forever and last_digit % self.leave_after == 0:
+                    if not self.run_forever and last_digits % self.leave_after == 0:
                         print("Leaving Game.")
                         return
 
                     # Reset the board.
-                    if last_digit % self.reset_every == 0:
+                    if last_digits % self.reset_every == 0:
                         print("Restarting Game.")
                         self.reset(self.board.b1)
                         generations = 0

@@ -28,9 +28,8 @@ def get_palette(colors: int):
 def reset_palette(palette):
     chunks = 255 // len(palette)
     palette[0] = BLACK
-    print(f"Color 0: {palette[0]}")
+    print("Regenerating Palette.")
     random_offset = random.randint(0, 50)
     for i in range(1, len(palette)):
         offset = i * chunks
         palette[i] = colorwheel(offset + random_offset)
-        print(f"Color {i}: {palette[i]} at offset {offset}")
