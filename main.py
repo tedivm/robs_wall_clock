@@ -8,7 +8,7 @@ import random
 import board
 
 import network
-from modes import highlife_colors, life_colors, life_simple, rain, war
+from modes import highlife_colors, life_colors, life_simple, rain, rule30, war
 from utils.gameboard import GameBoard
 from utils.internettime import InternetTime
 
@@ -46,6 +46,7 @@ MODES = {
     "war": war,
     "rain": rain,
     "highlife_colors": highlife_colors,
+    "rule30": rule30,
 }
 
 run_forever = False
