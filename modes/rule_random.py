@@ -6,13 +6,16 @@ from utils.cells import CellRules
 class RuleRandom(CellRules):
     reset_every = 1
 
+    rules_single = [30, 45, 57, 86, 105, 110, 124, 193]
+    rules_multiple = [30, 45, 54, 57, 86, 110, 120, 124, 193]
+
     def reset(self, output):
-        if random.random() < 0.20:
-            self.rule_number = 30
+        if random.random() < 0.33:
+            self.rule_number = random.choice(self.rules_single)
             self.starting_cells = 1
         else:
-            self.rule_number = random.choice([30, 90, 110, 120])
-            self.starting_cells = random.randint(1, output.width // 3)
+            self.rule_number = random.choice(self.rules_multiple)
+            self.starting_cells = random.randint(2, output.width // 3)
 
         print(
             f"Rule Random reset: rule {self.rule_number} with {self.starting_cells} starting cells."

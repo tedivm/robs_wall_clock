@@ -1,4 +1,17 @@
-CIRCUITPY_PYSTACK_SIZE = 3072
+
 CIRCUITPY_WIFI_PASSWORD = ""
 CIRCUITPY_WIFI_SSID = ""
 TIMEZONE = "America/Chicago"
+
+# Do not lower this value or the device may crash.
+CIRCUITPY_PYSTACK_SIZE = 3072
+
+# By default we cycle through the different modes. You can set a specific mode here.
+#MODE = "ant"
+
+# When debugging it may be useful to disable internet access so you can reload
+# without waiting for the wifi to connect.
+#DISABLE_INTERNET = "true"
+
+# If you are testing new code and run into memory issues, you can log memory usage.
+#LOG_MEMORY = "true"
