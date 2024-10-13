@@ -1,32 +1,15 @@
 import random
 
-from utils.cells import Cell
+from utils.cells import CellLine
 from utils.memory import gc_decorator
 from utils.palette import BLACK, WHITE, reset_palette
 
 
-class Rain(Cell):
-
-    # Function adapted from https://github.com/adafruit/Adafruit_Learning_System_Guides/blob/main/CircuitPython_RGBMatrix/life/code.py
-    @gc_decorator
-    def apply_life_rule(self, old, new):
-        width = old.width
-        height = old.height
-        for y in range(height):
-            if y == 0:
-                self.first_row(old, new)
-                continue
-
-            yyy = y * width
-            ym1 = ((y + height - 1) % height) * width
-            for x in range(width):
-                new[x + yyy] = old[x + ym1]
-
-        return True
+class Rain(CellLine):
 
     def first_row(self, old, new):
         y = 0
-
+        has_cells = False
         if self.mode == "spectrum":
             self.current_color += 1
             if self.current_color >= self.board.max_colors:
@@ -34,6 +17,7 @@ class Rain(Cell):
 
         for x in range(old.width):
             if random.random() < self.random_grid_density:
+                has_cells = True
                 if self.mode == "one":
                     new[x + y] = self.color
                 elif self.mode == "spectrum":
@@ -43,7 +27,7 @@ class Rain(Cell):
             else:
                 new[x + y] = 0
 
-        return
+        return has_cells
 
     @gc_decorator
     def reset(self, output):
@@ -63,11 +47,10 @@ class Rain(Cell):
             self.current_color = random.randint(1, self.board.max_colors - 1)
 
         if self.mode == "random" or self.mode == "spectrum":
-            if random.random() < 0.5:
+            if random.random() < 0.2:
                 self.random_grid_density = 1
 
-        for i in range(output.height * output.width):
-            output[i] = 0
+        self.board.clear_background()
 
         if self.random_grid_density == 1:
             print("BLACK CLOCK")

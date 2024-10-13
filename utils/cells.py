@@ -1,10 +1,17 @@
 import random
 
 from utils.memory import gc_decorator
-from utils.palette import WHITE, reset_palette
+from utils.palette import WHITE, colorwheel, reset_palette
 
 
-class Cell:
+def reverseString(s):
+    res = []
+    for i in range(len(s) - 1, -1, -1):
+        res.append(s[i])
+    return "".join(res)
+
+
+class CellGrid:
 
     text_color = WHITE
     random_grid_density = 0.33
@@ -111,5 +118,88 @@ class Cell:
                     adjusted_y = (y + offset) % height
                     output[x + yyy] = int(adjusted_y / spectrum_size) + 1
 
+
+class CellLine(CellGrid):
+
+    current_color = None
+
+    @gc_decorator
     def apply_life_rule(self, old, new):
+        width = old.width
+        height = old.height
+        for y in range(height):
+            if y == 0:
+                has_cells = self.first_row(old, new)
+                continue
+
+            yyy = y * width
+            ym1 = ((y + height - 1) % height) * width
+            for x in range(width):
+                new[x + yyy] = old[x + ym1]
+                if new[x + yyy] > 0:
+                    has_cells = True
+
+        return has_cells
+
+    @gc_decorator
+    def reset(self, output):
+        print("Rule reset.")
+        self.one_color = random.random() < 0.2
+        if self.one_color:
+            self.board.palette[1] = colorwheel(random.randint(0, 255))
+            start_color = 1
+        else:
+            self.current_color = random.randint(1, self.board.max_colors - 1)
+            start_color = self.current_color
+
+        self.board.clear_background()
+
+        if self.starting_cells == 1:
+            output[output.width // 2] = start_color
+        else:
+            for i in range(self.starting_cells):
+                output[random.randint(0, output.width - 1)] = start_color
+
+    def first_row(self, old, new):
         raise NotImplementedError()
+
+
+class CellRules(CellLine):
+    current_color = None
+    reset_every = 5
+    starting_cells = 1
+    rule_number = 30
+
+    def first_row(self, old, new):
+        y = 0
+
+        if self.one_color:
+            color = 1
+        else:
+            if not self.current_color:
+                self.current_color = random.randint(1, self.board.max_colors)
+            else:
+                self.current_color += 1
+                if self.current_color >= self.board.max_colors:
+                    self.current_color = 1
+            color = self.current_color
+
+        has_cells = False
+
+        for x in range(old.width):
+            left = "1" if old[((x - 1) % old.width)] > 0 else "0"
+            current = "1" if old[x] > 0 else "0"
+            right = "1" if old[((x + 1) % old.width)] > 0 else "0"
+            triggered_rule = int(f"{left}{current}{right}", 2)
+            if self.rule_flipped[triggered_rule] == "1":
+                new[x + y] = color
+                has_cells = True
+            else:
+                new[x + y] = 0
+
+        return has_cells
+
+    def reset(self, output):
+        binary_rule = "{0:08b}".format(self.rule_number)
+        self.rule_flipped = reverseString(binary_rule)
+        super().reset(output)

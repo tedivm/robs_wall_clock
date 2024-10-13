@@ -1,11 +1,11 @@
 import random
 
-from utils.cells import Cell
+from utils.cells import CellGrid
 from utils.memory import gc_decorator
 from utils.palette import colorwheel
 
 
-class LifeSimple(Cell):
+class LifeSimple(CellGrid):
 
     # Function adapted from https://github.com/adafruit/Adafruit_Learning_System_Guides/blob/main/CircuitPython_RGBMatrix/life/code.py
     @gc_decorator

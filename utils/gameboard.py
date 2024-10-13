@@ -97,3 +97,7 @@ class GameBoard:
     def set_clock_color(self, color):
         self.clock_label_1.color = color
         self.clock_label_2.color = color
+
+    def clear_background(self):
+        self.b1.fill(0)
+        self.b2.fill(0)

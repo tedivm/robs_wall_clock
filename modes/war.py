@@ -1,11 +1,11 @@
 import random
 
-from utils.cells import Cell
+from utils.cells import CellGrid
 from utils.memory import gc_decorator
 from utils.palette import BLACK
 
 
-class War(Cell):
+class War(CellGrid):
 
     text_color = BLACK
     random_grid_density = 1

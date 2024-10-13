@@ -8,7 +8,15 @@ import random
 import board
 
 import network
-from modes import highlife_colors, life_colors, life_simple, rain, rule30, war
+from modes import (
+    highlife_colors,
+    life_colors,
+    life_simple,
+    rain,
+    rule30,
+    rule_random,
+    war,
+)
 from utils.gameboard import GameBoard
 from utils.internettime import InternetTime
 
@@ -39,14 +47,15 @@ it = InternetTime(
 
 
 GAMEBOARD = GameBoard(wifi, it)
-
+RANDOM_EXCLUDE_MODES = ["rule30"]
 MODES = {
-    "life_simple": life_simple,
-    "life_colors": life_colors,
-    "war": war,
-    "rain": rain,
     "highlife_colors": highlife_colors,
+    "life_colors": life_colors,
+    "life_simple": life_simple,
+    "rain": rain,
     "rule30": rule30,
+    "rule_random": rule_random,
+    "war": war,
 }
 
 run_forever = False
@@ -66,7 +75,7 @@ while True:
         MODE.run(GAMEBOARD, True)
     else:
         if not RANDOM_OPTIONS:
-            RANDOM_OPTIONS = list(MODES.keys())
+            RANDOM_OPTIONS = list(set(MODES.keys()) - set(RANDOM_EXCLUDE_MODES))
             shuffle(RANDOM_OPTIONS)
         mode_name = RANDOM_OPTIONS.pop()
         print(f"Running {mode_name} until it finishes.")
