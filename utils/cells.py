@@ -1,7 +1,7 @@
 import random
 
 from utils.memory import gc_decorator
-from utils.palette import WHITE, colorwheel, reset_palette
+from utils.palette import BLACK, WHITE, colorwheel, reset_palette
 
 
 def reverseString(s):
@@ -144,6 +144,7 @@ class CellLine(CellGrid):
     @gc_decorator
     def reset(self, output):
         print("Rule reset.")
+        reset_palette(self.board.palette)
         self.one_color = random.random() < 0.2
         if self.one_color:
             self.board.palette[1] = colorwheel(random.randint(0, 255))
@@ -200,6 +201,63 @@ class CellRules(CellLine):
         return has_cells
 
     def reset(self, output):
+        reset_palette(self.board.palette)
         binary_rule = "{0:08b}".format(self.rule_number)
         self.rule_flipped = reverseString(binary_rule)
         super().reset(output)
+
+
+class CellCreep(CellGrid):
+    reset_every = 5
+    creeps = []
+    min_creeps = 5
+    max_creeps = 20
+    toggle_clock = False
+
+    density_count = []
+
+    @gc_decorator
+    def apply_life_rule(self, old, new):
+        width = old.width
+        height = old.height
+        grid_size = width * height
+        lit_cells = 0
+        for y in range(height):
+            yyy = y * width
+            for x in range(width):
+                new[x + yyy] = old[x + yyy]
+                if new[x + yyy] > 0:
+                    lit_cells += 1
+
+        for creep in self.creeps:
+            self.process_creep(creep, old, new)
+
+        DENSITY_KEEP = 5
+        density = lit_cells / grid_size
+        self.density_count.append(density)
+        if len(self.density_count) > DENSITY_KEEP:
+            self.density_count.pop(0)
+
+        if self.toggle_clock:
+            density_values = len(self.density_count)
+            if density_values >= DENSITY_KEEP:
+                rolling_density = sum(self.density_count) / len(self.density_count)
+                print(f"Rolling Density: {rolling_density}")
+                if density > 0.70:
+                    self.board.set_clock_color(BLACK)
+
+        return True
+
+    def process_creep(self, creep, old, new):
+        raise NotImplementedError()
+
+    @gc_decorator
+    def reset(self, output):
+        self.board.clear_background()
+        self.board.set_clock_color(WHITE)
+        self.creeps = []
+        for i in range(random.randint(self.min_creeps, self.max_creeps)):
+            self.creeps.append(self.new_creep(output))
+
+    def new_creep(self, output):
+        raise NotImplementedError()

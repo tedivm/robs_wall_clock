@@ -2,6 +2,8 @@ import random
 
 import displayio
 
+from utils.shuffle import shuffle
+
 BLACK = 0x000000
 WHITE = 0xFFFFFF
 
@@ -25,11 +27,29 @@ def get_palette(colors: int):
     return palette
 
 
-def reset_palette(palette):
-    chunks = 255 // len(palette)
+def reset_palette(palette, max_colors=None):
+
+    if max_colors is None:
+        max_colors = len(palette)
+
+    chunks = 255 // max_colors
     palette[0] = BLACK
     print("Regenerating Palette.")
-    random_offset = random.randint(0, 50)
-    for i in range(1, len(palette)):
+    random_offset = random.randint(0, 255)
+    for i in range(1, max_colors):
         offset = i * chunks
         palette[i] = colorwheel(offset + random_offset)
+
+
+def randomize_palette(palette):
+    reset_palette(palette)
+    palette[0] = BLACK
+    options = []
+
+    for i in range(1, len(palette) - 1):
+        options.append(palette[i])
+
+    shuffle(options)
+
+    for i in range(1, len(palette) - 1):
+        palette[i] = options.pop()

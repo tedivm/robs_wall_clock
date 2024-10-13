@@ -2,7 +2,9 @@ import time
 
 import rtc
 from adafruit_datetime import datetime, timedelta
+
 from utils.memory import gc_decorator
+
 
 def _datetime_to_timestruct(dt):
     return time.struct_time(
@@ -18,6 +20,7 @@ def _datetime_to_timestruct(dt):
             -1,
         )
     )
+
 
 def _timestruct_to_datetime(ts):
     return datetime(
@@ -36,6 +39,7 @@ class InternetTime:
         network,
         timezone_name="America/Chicago",
         seconds_between_updates=300,
+        disable_internet=False,
         debug=False,
     ):
         self.timezone_name = timezone_name
@@ -44,6 +48,7 @@ class InternetTime:
         self.debug = debug
         self.utc_offset_hours = 0
         self.utc_offset_minutes = 0
+        self.disable_internet = disable_internet
 
     @gc_decorator
     def get_time(self):
@@ -99,6 +104,9 @@ class InternetTime:
     def _update_system_time(self):
         # If the update fails we use the current clock to record the update attempt.
         self.last_system_update_attempt = _timestruct_to_datetime(rtc.RTC().datetime)
+
+        if self.disable_internet:
+            return
 
         if self.debug:
             print("Updating from Internet.")

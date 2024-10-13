@@ -9,6 +9,7 @@ import board
 
 import network
 from modes import (
+    ant,
     highlife_colors,
     life_colors,
     life_simple,
@@ -19,14 +20,9 @@ from modes import (
 )
 from utils.gameboard import GameBoard
 from utils.internettime import InternetTime
+from utils.shuffle import shuffle
 
 print(f"Modules Imported: {gc.mem_free()}.")
-
-
-def shuffle(lst):
-    for i in range(len(lst)):
-        j = random.randrange(0, len(lst))
-        lst[i], lst[j] = lst[j], lst[i]
 
 
 wifi = network.RobsNetwork(debug=True, status_neopixel=board.NEOPIXEL)
@@ -36,19 +32,22 @@ esp._debug = True
 print(f"Network Initialized, Free Memory: {gc.mem_free()}.")
 
 timezone = os.getenv("TIMEZONE", "America/Chicago")
-clock_update = int(os.getenv("CLOCK_INTERNET_UPDATE", 600))
+clock_update = int(os.getenv("CLOCK_INTERNET_UPDATE", 3600))
+disable_internet = os.getenv("DISABLE_INTERNET", False) == "true"
 
 it = InternetTime(
     wifi,
     os.getenv("TIMEZONE", "America/Chicago"),
     debug=True,
     seconds_between_updates=clock_update,
+    disable_internet=disable_internet,
 )
 
 
 GAMEBOARD = GameBoard(wifi, it)
 RANDOM_EXCLUDE_MODES = ["rule30"]
 MODES = {
+    "ant": ant,
     "highlife_colors": highlife_colors,
     "life_colors": life_colors,
     "life_simple": life_simple,
