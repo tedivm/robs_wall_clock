@@ -14,11 +14,13 @@ logged_gc("Modules Imported")
 UP_BUTTON = DigitalInOut(board.BUTTON_UP)
 UP_BUTTON.direction = Direction.INPUT
 UP_BUTTON.pull = Pull.UP
+UP_BUTTON_START_STATE = UP_BUTTON.value
 
 
 DOWN_BUTTON = DigitalInOut(board.BUTTON_DOWN)
 DOWN_BUTTON.direction = Direction.INPUT
 DOWN_BUTTON.pull = Pull.UP
+DOWN_BUTTON_START_STATE = DOWN_BUTTON.value
 
 logged_gc("Debouncer")
 
@@ -50,7 +52,7 @@ class CellGrid:
         first_run = True
         while True:
 
-            if not UP_BUTTON.value:
+            if UP_BUTTON.value != UP_BUTTON_START_STATE:
                 print("UP Button Pressed.")
                 if self.board.clock_enabled:
                     print("Disabling Clock.")
@@ -59,7 +61,7 @@ class CellGrid:
                     print("Enabling Clock.")
                     self.board.enable_clock()
 
-            if not DOWN_BUTTON.value:
+            if DOWN_BUTTON.value != DOWN_BUTTON_START_STATE:
                 print("DOWN Button Pressed.")
                 print(f"Leaving game after {generations} generations.")
                 return
