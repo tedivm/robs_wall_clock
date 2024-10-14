@@ -12,13 +12,22 @@ class GameBoard:
 
     bit_depth = 3
 
-    def __init__(self, network, it, life_scale=1, max_colors=16, text_color=WHITE):
+    def __init__(
+        self,
+        network,
+        it,
+        life_scale=1,
+        max_colors=16,
+        text_color=WHITE,
+        clock_enabled=True,
+    ):
         logged_gc("Initializing Game Board")
         self.network = network
         self.it = it
         self.life_scale = life_scale
         self.max_colors = max_colors
         self.text_color = text_color
+        self.clock_enabled = clock_enabled
 
         matrixportal = MatrixPortal(
             status_neopixel=board.NEOPIXEL,
@@ -57,7 +66,10 @@ class GameBoard:
 
         logged_gc("Groups Initialized")
 
-        old_text = it.time_string()
+        if self.clock_enabled:
+            old_text = it.time_string()
+        else:
+            old_text = ""
 
         TEXT_SCALE_FACTOR = 2
         TEXT_POSITION = ((self.display.width / 2) + 1, (self.display.height / 2))
@@ -90,9 +102,19 @@ class GameBoard:
         self.g1 = g1
         self.g2 = g2
 
+    def disable_clock(self):
+        self.clock_enabled = False
+        self.clock_label_1.text = ""
+        self.clock_label_2.text = ""
+
+    def enable_clock(self):
+        self.clock_enabled = True
+        self.set_clock(self.it.time_string())
+
     def set_clock(self, text):
-        self.clock_label_1.text = text
-        self.clock_label_2.text = text
+        if self.clock_enabled:
+            self.clock_label_1.text = text
+            self.clock_label_2.text = text
 
     def set_clock_color(self, color):
         self.clock_label_1.color = color

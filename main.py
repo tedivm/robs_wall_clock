@@ -35,7 +35,8 @@ print(f"Network Initialized, Free Memory: {gc.mem_free()}.")
 
 timezone = os.getenv("TIMEZONE", "America/Chicago")
 clock_update = int(os.getenv("CLOCK_INTERNET_UPDATE", 3600))
-disable_internet = os.getenv("DISABLE_INTERNET", False) == "true"
+disable_internet = os.getenv("DISABLE_INTERNET", "false").lower() == "true"
+clock_enabled = os.getenv("CLOCK_ENABLED", "true").lower() == "true"
 
 it = InternetTime(
     wifi,
@@ -45,8 +46,7 @@ it = InternetTime(
     disable_internet=disable_internet,
 )
 
-
-GAMEBOARD = GameBoard(wifi, it)
+GAMEBOARD = GameBoard(wifi, it, clock_enabled=clock_enabled)
 RANDOM_EXCLUDE_MODES = ["rule30"]
 MODES = {
     "ant": ant,

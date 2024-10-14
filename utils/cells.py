@@ -1,7 +1,26 @@
 import random
+import time
 
-from utils.memory import gc_decorator
+import board
+
+# from adafruit_debouncer import Debouncer
+from digitalio import DigitalInOut, Direction, Pull
+
+from utils.memory import gc_decorator, logged_gc
 from utils.palette import BLACK, WHITE, colorwheel, reset_palette
+
+logged_gc("Modules Imported")
+
+UP_BUTTON = DigitalInOut(board.BUTTON_UP)
+UP_BUTTON.direction = Direction.INPUT
+UP_BUTTON.pull = Pull.UP
+
+
+DOWN_BUTTON = DigitalInOut(board.BUTTON_DOWN)
+DOWN_BUTTON.direction = Direction.INPUT
+DOWN_BUTTON.pull = Pull.UP
+
+logged_gc("Debouncer")
 
 
 def reverseString(s):
@@ -30,13 +49,27 @@ class CellGrid:
         old_text = ""
         first_run = True
         while True:
+
+            if not UP_BUTTON.value:
+                print("UP Button Pressed.")
+                if self.board.clock_enabled:
+                    print("Disabling Clock.")
+                    self.board.disable_clock()
+                else:
+                    print("Enabling Clock.")
+                    self.board.enable_clock()
+
+            if not DOWN_BUTTON.value:
+                print("DOWN Button Pressed.")
+                print(f"Leaving game after {generations} generations.")
+                return
+
             new_text = self.board.it.time_string()
             if new_text != old_text:
                 print(f"Updating time: {new_text}")
                 print(f"Generations: {generations}")
                 old_text = new_text
-                self.board.clock_label_1.text = new_text
-                self.board.clock_label_2.text = new_text
+                self.board.set_clock_color(self.text_color)
 
                 if not first_run:
                     print("Checking for game exit conditions.")
