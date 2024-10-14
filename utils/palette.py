@@ -39,6 +39,7 @@ def reset_palette(palette, max_colors=None):
     for i in range(1, max_colors):
         offset = i * chunks
         palette[i] = colorwheel(offset + random_offset)
+        print(f"Color {i}: {palette[i]}, offset: {offset}")
 
 
 def randomize_palette(palette):

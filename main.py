@@ -15,8 +15,10 @@ from modes import (
     life_simple,
     rain,
     rule30,
-    rule_random,
     war,
+    wolfram_four,
+    wolfram_three,
+    wolfram_two,
 )
 from utils.gameboard import GameBoard
 from utils.internettime import InternetTime
@@ -53,8 +55,10 @@ MODES = {
     "life_simple": life_simple,
     "rain": rain,
     "rule30": rule30,
-    "rule_random": rule_random,
     "war": war,
+    "wolfram_two": wolfram_two,
+    "wolfram_three": wolfram_three,
+    "wolfram_four": wolfram_four,
 }
 
 run_forever = False

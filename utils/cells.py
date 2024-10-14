@@ -127,6 +127,9 @@ class CellLine(CellGrid):
     def apply_life_rule(self, old, new):
         width = old.width
         height = old.height
+        grid_size = width * height
+        cell_count = 0
+        has_cells = False
         for y in range(height):
             if y == 0:
                 has_cells = self.first_row(old, new)
@@ -137,9 +140,9 @@ class CellLine(CellGrid):
             for x in range(width):
                 new[x + yyy] = old[x + ym1]
                 if new[x + yyy] > 0:
-                    has_cells = True
+                    cell_count += 1
 
-        return has_cells
+        return has_cells and cell_count < (grid_size - width)
 
     @gc_decorator
     def reset(self, output):
@@ -205,6 +208,51 @@ class CellRules(CellLine):
         binary_rule = "{0:08b}".format(self.rule_number)
         self.rule_flipped = reverseString(binary_rule)
         super().reset(output)
+
+
+class CellTotalistic(CellLine):
+
+    code = 777
+    num_colors = 3
+    rule = []
+    starting_cells = 1
+
+    def convert_code_to_ruleset(self, code, num_colors):
+        max_sum = (num_colors - 1) * 3
+        ruleset = []
+        while code > 0:
+            ruleset.append(code % num_colors)
+            code //= num_colors
+        # Pad with zeros for sums that are not covered
+        while len(ruleset) <= max_sum:
+            ruleset.append(0)
+        return ruleset
+
+    def first_row(self, old, new):
+        y = 0
+        has_cells = False
+        for x in range(old.width):
+            left = old[((x - 1) % old.width)]
+            current = old[x]
+            right = old[((x + 1) % old.width)]
+            total = left + current + right
+            new[x + y] = self.rule[total]
+
+            if new[x + y] > 0:
+                has_cells = True
+
+        return has_cells
+
+    def reset(self, output):
+        # reset_palette(self.board.palette, self.num_colors)
+        reset_palette(self.board.palette, 8)
+        self.board.clear_background()
+        self.rule = self.convert_code_to_ruleset(self.code, self.num_colors)
+        if self.starting_cells == 1:
+            output[output.width // 2] = 1
+        else:
+            for i in range(self.starting_cells):
+                output[random.randint(0, output.width - 1)] = 1
 
 
 class CellCreep(CellGrid):
