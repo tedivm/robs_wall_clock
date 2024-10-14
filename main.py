@@ -38,6 +38,7 @@ clock_update = int(os.getenv("CLOCK_INTERNET_UPDATE", 3600))
 disable_internet = os.getenv("DISABLE_INTERNET", "false").lower() == "true"
 clock_enabled = os.getenv("CLOCK_ENABLED", "true").lower() == "true"
 brightness = float(os.getenv("BRIGHTNESS", 100)) / 100.00
+time_format = os.getenv("TIME_FORMAT", "24")
 
 it = InternetTime(
     wifi,
@@ -52,6 +53,7 @@ GAMEBOARD = GameBoard(
     it,
     clock_enabled=clock_enabled,
     brightness=brightness,
+    time_format=time_format,
 )
 RANDOM_EXCLUDE_MODES = ["rule30"]
 MODES = {

@@ -1,36 +1,19 @@
 import time
 
 import rtc
-from adafruit_datetime import datetime, timedelta
 
 from utils.memory import gc_decorator
 
 
-def _datetime_to_timestruct(dt):
-    return time.struct_time(
-        (
-            dt.year,
-            dt.month,
-            dt.day,
-            dt.hour,
-            dt.minute,
-            dt.second,
-            dt.weekday(),
-            dt.timetuple().tm_yday,
-            -1,
-        )
-    )
-
-
-def _timestruct_to_datetime(ts):
-    return datetime(
-        ts.tm_year,
-        ts.tm_mon,
-        ts.tm_mday,
-        ts.tm_hour,
-        ts.tm_min,
-        ts.tm_sec,
-    )
+def _timestruct_to_seconds(ts):
+    seconds = 0
+    seconds += ts.tm_sec
+    seconds += ts.tm_min * 60
+    seconds += ts.tm_hour * 3600
+    seconds += ts.tm_mday * 86400
+    seconds += ts.tm_mon * 2592000
+    seconds += (ts.tm_year - 1970) * 31536000
+    return seconds
 
 
 class InternetTime:
@@ -52,31 +35,62 @@ class InternetTime:
 
     @gc_decorator
     def get_time(self):
-        if not hasattr(self, "last_system_update"):
-            self._update_system_time()
 
         try:
-            now = _timestruct_to_datetime(rtc.RTC().datetime)
-            if now - self.last_system_update_attempt > timedelta(
-                seconds=self.seconds_between_updates
-            ):
-                self._update_system_time()
+            if not hasattr(self, "_last_update_attempt"):
+                self._update_time_data_rate_limited()
+
+            now = _timestruct_to_seconds(rtc.RTC().datetime)
+            if now - self._last_update_attempt > self.seconds_between_updates:
+                self._update_time_data_rate_limited()
         except Exception as e:
             print(e)
             print("InternetTime: Could not update system time")
 
-        utc = _timestruct_to_datetime(rtc.RTC().datetime)
-        adjusted_time = utc + timedelta(
-            hours=self.utc_offset_hours, minutes=self.utc_offset_minutes
+        ts = rtc.RTC().datetime
+        current_hour = ts.tm_hour + self.utc_offset_hours
+        current_min = ts.tm_min + self.utc_offset_minutes
+        if current_min >= 60:
+            current_hour += 1
+            current_min -= 60
+        current_hour = current_hour % 24
+
+        return time.struct_time(
+            (
+                ts.tm_year,
+                ts.tm_mon,
+                ts.tm_mday,
+                current_hour,
+                current_min % 60,
+                ts.tm_sec,
+                ts.tm_wday,
+                ts.tm_yday,
+                -1,
+            )
         )
 
-        return adjusted_time
-
-    def time_string(self, format="24"):
+    def time_string(self, format="12"):
         current_time = self.get_time()
-        return f"{current_time.hour:02}:{current_time.minute:02}"
+        if format == "24":
+            hour = f"{current_time.tm_hour:02}"
+        else:
+            hour = f"{current_time.tm_hour % 12:02}"
 
-    def _update_timezone_data(self):
+        return f"{hour:02}:{current_time.tm_min:02}"
+
+    def _update_time_data_rate_limited(self):
+        now = _timestruct_to_seconds(rtc.RTC().datetime)
+        if hasattr(self, "_last_update_attempt"):
+            if now - self._last_update_attempt > 300:
+                return
+
+        self._last_update_attempt = now
+        self._update_time_data()
+        now = _timestruct_to_seconds(rtc.RTC().datetime)
+        self._last_update_attempt = now
+        self._last_successful_update = now
+
+    def _update_time_data(self):
         if self.debug:
             print("InternetTime: Fetching new time from server.")
 
@@ -90,7 +104,6 @@ class InternetTime:
 
         data = response.json()
 
-        self.timestamp_retrieved = self._get_ticks()
         self.start_timestamp = data["unixtime"]
         self.utc_offset = data["utc_offset"]
         self.utc_offset_sign = "-" if self.utc_offset[0] == "-" else ""
@@ -99,48 +112,8 @@ class InternetTime:
         self.utc_offset_hours = int(f"{split_offset[0]}")
         self.utc_offset_minutes = int(f"{self.utc_offset_sign}{split_offset[1]}")
 
+        now = time.localtime(data["unixtime"])
+        self.timestamp_retrieved = now
+        rtc.RTC().datetime = now
+
         return True
-
-    def _update_system_time(self):
-        # If the update fails we use the current clock to record the update attempt.
-        self.last_system_update_attempt = _timestruct_to_datetime(rtc.RTC().datetime)
-
-        if self.disable_internet:
-            return
-
-        if self.debug:
-            print("Updating from Internet.")
-        rtc.RTC().datetime = self._get_internet_time()
-
-        self.last_system_update = _timestruct_to_datetime(rtc.RTC().datetime)
-
-        # Since the update did not fail, and the clock may have shifted, update the attempt time.
-        self.last_system_update_attempt = self.last_system_update
-
-    def _get_internet_time(self):
-        if not hasattr(self, "start_timestamp"):
-            if not self._update_timezone_data():
-                raise Exception("InternetTime: Could not update timezone data.")
-
-        current_tick = self._get_ticks()
-        tick_diff = current_tick - self.timestamp_retrieved
-
-        if self.debug:
-            print(f"InternetTime: Tick diff: {tick_diff}")
-            print(f"InternetTime: retrieved tick: {self.timestamp_retrieved}")
-            print(f"InternetTime: current_tick: {current_tick}")
-            print(f"InternetTime: Timestamp retrieved: {self.timestamp_retrieved}")
-
-        if tick_diff > self.seconds_between_updates:
-            self._update_timezone_data()
-            tick_diff = int(current_tick - self.timestamp_retrieved)
-
-        # Start with the internet loaded time.
-        formatted_time = datetime.fromtimestamp(self.start_timestamp)
-        # Add the difference in seconds to the internet loaded time.
-        tick_adjusted = formatted_time + timedelta(seconds=int(tick_diff))
-
-        return _datetime_to_timestruct(tick_adjusted)
-
-    def _get_ticks(self):
-        return time.time()

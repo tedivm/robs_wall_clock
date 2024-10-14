@@ -123,7 +123,7 @@ class ColorHighLife(CellGrid):
                             if count == neighbor_colors[next_color]:
                                 next_color = random.choice([next_color, color])
                 else:
-                    next_color = BLACK
+                    next_color = 0
 
                 new[x + yyy] = next_color
                 xm1 = x

@@ -66,7 +66,7 @@ class CellGrid:
                 print(f"Leaving game after {generations} generations.")
                 return
 
-            new_text = self.board.it.time_string()
+            new_text = self.board.get_time_string()
             if new_text != old_text:
                 print(f"Updating time: {new_text}")
                 print(f"Generations: {generations}")
@@ -117,11 +117,15 @@ class CellGrid:
         for i in range(output.height * output.width):
             if random.random() < self.random_grid_density:
                 output[i] = random.randint(1, self.board.max_colors - 1)
+            else:
+                output[i] = 0
 
     def rainbow_wave(self, output):
         for i in range(output.height * output.width):
             if random.random() < self.random_grid_density:
                 output[i] = (i % (self.board.max_colors - 1)) + 1
+            else:
+                output[i] = 0
 
     def rainbow_vertical(self, output):
         width = output.width
@@ -137,6 +141,8 @@ class CellGrid:
                 if random.random() < self.random_grid_density:
                     adjusted_x = (x + offset) % width
                     output[x + yyy] = int(adjusted_x / spectrum_size) + 1
+                else:
+                    output[x + yyy] = 0
 
     def rainbow_horizontal(self, output):
         width = output.width
@@ -152,6 +158,8 @@ class CellGrid:
                 if random.random() < self.random_grid_density:
                     adjusted_y = (y + offset) % height
                     output[x + yyy] = int(adjusted_y / spectrum_size) + 1
+                else:
+                    output[x + yyy] = 0
 
 
 class CellLine(CellGrid):

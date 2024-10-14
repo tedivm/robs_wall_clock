@@ -13,10 +13,11 @@ def gc_decorator(func):
     return wrapper
 
 
-def logged_gc(source="", log=True):
+def logged_gc(source="", log=True, log_always=False):
     gc.collect()
-    if not log or not LOG_MEMORY:
-        return
+    if not log_always:
+        if not log or not LOG_MEMORY:
+            return
     if source:
         print(f"{source}: Garbage Collected, Free memory at: {gc.mem_free()}.")
     else:
