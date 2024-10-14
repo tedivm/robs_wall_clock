@@ -2,7 +2,7 @@ import random
 
 from utils.cells import CellLine
 from utils.memory import gc_decorator
-from utils.palette import BLACK, WHITE, reset_palette
+from utils.palette import BLACK, WHITE
 
 
 class Rain(CellLine):
@@ -40,10 +40,10 @@ class Rain(CellLine):
             self.color = random.randint(1, self.board.max_colors - 1)
         elif random_value <= 0.60:
             self.mode = "random"
-            reset_palette(self.board.palette)
+            self.board.reset_palette()
         else:
             self.mode = "spectrum"
-            reset_palette(self.board.palette)
+            self.board.reset_palette()
             self.current_color = random.randint(1, self.board.max_colors - 1)
 
         if self.mode == "random" or self.mode == "spectrum":

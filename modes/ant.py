@@ -2,7 +2,6 @@ import random
 
 from utils.cells import CellCreep
 from utils.memory import gc_decorator
-from utils.palette import randomize_palette, reset_palette
 
 DIRECTION_NORTH = 0
 DIRECTION_EAST = 1
@@ -75,7 +74,7 @@ class Ant(CellCreep):
 
         self.path_colors = len(self.rule)
         self.ant_color = len(self.rule)
-        reset_palette(self.board.palette, self.path_colors + 1)
+        self.board.reset_palette(self.path_colors + 1)
         print(f"Ant Rule: {self.rule} with {len(self.creeps)} ants.")
 
     def new_creep(self, output):

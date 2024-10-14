@@ -21,24 +21,24 @@ def colorwheel(pos):
     return (pos * 3, 0, 255 - pos * 3)
 
 
-def get_palette(colors: int):
+def get_palette(colors: int, brightness=1):
     palette = displayio.Palette(colors)
-    reset_palette(palette)
+    reset_palette(palette, brightness=brightness)
     return palette
 
 
-def reset_palette(palette, max_colors=None):
-
+def reset_palette(palette, max_colors=None, brightness=1):
+    dimness = 1 - brightness
     if max_colors is None:
         max_colors = len(palette)
 
     chunks = 255 // max_colors
     palette[0] = BLACK
-    print("Regenerating Palette.")
+    print(f"Regenerating Palette with brightness {brightness}.")
     random_offset = random.randint(0, 255)
     for i in range(1, max_colors):
         offset = i * chunks
-        palette[i] = colorwheel(offset + random_offset)
+        palette[i] = dim_color(colorwheel(offset + random_offset), dimness)
         print(f"Color {i}: {palette[i]}, offset: {offset}")
 
 
@@ -54,3 +54,20 @@ def randomize_palette(palette):
 
     for i in range(1, len(palette) - 1):
         palette[i] = options.pop()
+
+
+def interpolate(color_a, color_b, t):
+    # 'color_a' and 'color_b' are RGB tuples
+    # 't' is a value between 0.0 and 1.0
+    # this is a naive interpolation
+    return tuple(int(a + (b - a) * t) for a, b in zip(color_a, color_b))
+
+
+def dim_color(color, factor):
+    if factor > 0.8:
+        raise ValueError("Factor must be less than or equal to 0.8")
+    if factor < 0.0:
+        raise ValueError("Factor must be greater than or equal to 0.0")
+    if factor <= 0.01:
+        return color
+    return interpolate(color, (0, 0, 0), factor)

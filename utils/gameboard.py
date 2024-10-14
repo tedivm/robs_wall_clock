@@ -5,7 +5,7 @@ from adafruit_display_text import label
 from adafruit_matrixportal.matrixportal import MatrixPortal
 
 from utils.memory import logged_gc
-from utils.palette import BLACK, WHITE, get_palette
+from utils.palette import BLACK, WHITE, get_palette, reset_palette
 
 
 class GameBoard:
@@ -20,6 +20,7 @@ class GameBoard:
         max_colors=16,
         text_color=WHITE,
         clock_enabled=True,
+        brightness=1,
     ):
         logged_gc("Initializing Game Board")
         self.network = network
@@ -28,6 +29,7 @@ class GameBoard:
         self.max_colors = max_colors
         self.text_color = text_color
         self.clock_enabled = clock_enabled
+        self.brightness = brightness
 
         matrixportal = MatrixPortal(
             status_neopixel=board.NEOPIXEL,
@@ -123,3 +125,6 @@ class GameBoard:
     def clear_background(self):
         self.b1.fill(0)
         self.b2.fill(0)
+
+    def reset_palette(self, max_colors=None):
+        reset_palette(self.palette, max_colors, self.brightness)

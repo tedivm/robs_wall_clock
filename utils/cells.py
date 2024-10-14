@@ -7,7 +7,7 @@ import board
 from digitalio import DigitalInOut, Direction, Pull
 
 from utils.memory import gc_decorator, logged_gc
-from utils.palette import BLACK, WHITE, colorwheel, reset_palette
+from utils.palette import BLACK, WHITE, colorwheel
 
 logged_gc("Modules Imported")
 
@@ -102,7 +102,7 @@ class CellGrid:
 
     @gc_decorator
     def reset(self, output):
-        reset_palette(self.board.palette)
+        self.board.reset_palette()
         filler = random.choice(
             [
                 self.randomize,
@@ -182,7 +182,7 @@ class CellLine(CellGrid):
     @gc_decorator
     def reset(self, output):
         print("Rule reset.")
-        reset_palette(self.board.palette)
+        self.board.reset_palette()
         self.one_color = random.random() < 0.2
         if self.one_color:
             self.board.palette[1] = colorwheel(random.randint(0, 255))
@@ -239,7 +239,7 @@ class CellRules(CellLine):
         return has_cells
 
     def reset(self, output):
-        reset_palette(self.board.palette)
+        self.board.reset_palette()
         binary_rule = "{0:08b}".format(self.rule_number)
         self.rule_flipped = reverseString(binary_rule)
         super().reset(output)
@@ -280,7 +280,7 @@ class CellTotalistic(CellLine):
 
     def reset(self, output):
         # reset_palette(self.board.palette, self.num_colors)
-        reset_palette(self.board.palette, 8)
+        self.board.reset_palette(8)
         self.board.clear_background()
         self.rule = self.convert_code_to_ruleset(self.code, self.num_colors)
         if self.starting_cells == 1:
