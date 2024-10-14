@@ -5,7 +5,7 @@ from adafruit_display_text import label
 from adafruit_matrixportal.matrixportal import MatrixPortal
 
 from utils.memory import logged_gc
-from utils.palette import BLACK, WHITE, get_palette, reset_palette
+from utils.palette import BLACK, WHITE, dim_color, get_palette, reset_palette
 
 
 class GameBoard:
@@ -79,7 +79,7 @@ class GameBoard:
             terminalio.FONT,
             text=old_text,
             scale=TEXT_SCALE_FACTOR,
-            color=self.text_color,
+            color=BLACK,
         )
         clock_label_1.anchor_point = (0.5, 0.5)
         clock_label_1.anchored_position = TEXT_POSITION
@@ -89,7 +89,7 @@ class GameBoard:
             terminalio.FONT,
             text=old_text,
             scale=TEXT_SCALE_FACTOR,
-            color=self.text_color,
+            color=BLACK,
         )
         clock_label_2.anchor_point = (0.5, 0.5)
         clock_label_2.anchored_position = TEXT_POSITION
@@ -103,6 +103,8 @@ class GameBoard:
         self.b2 = b2
         self.g1 = g1
         self.g2 = g2
+
+        self.set_clock_color(self.text_color)
 
     def disable_clock(self):
         self.clock_enabled = False
@@ -119,6 +121,9 @@ class GameBoard:
             self.clock_label_2.text = text
 
     def set_clock_color(self, color):
+        if color != BLACK:
+            color = dim_color(color, self.brightness)
+
         self.clock_label_1.color = color
         self.clock_label_2.color = color
 

@@ -4,8 +4,8 @@ import displayio
 
 from utils.shuffle import shuffle
 
-BLACK = 0x000000
-WHITE = 0xFFFFFF
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
 
 def colorwheel(pos):
