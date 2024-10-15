@@ -1,28 +1,9 @@
 import random
-import time
-
-import board
-
-# from adafruit_debouncer import Debouncer
-from digitalio import DigitalInOut, Direction, Pull
 
 from utils.memory import gc_decorator, logged_gc
 from utils.palette import BLACK, WHITE, colorwheel
 
 logged_gc("Modules Imported")
-
-UP_BUTTON = DigitalInOut(board.BUTTON_UP)
-UP_BUTTON.direction = Direction.INPUT
-UP_BUTTON.pull = Pull.UP
-UP_BUTTON_START_STATE = UP_BUTTON.value
-
-
-DOWN_BUTTON = DigitalInOut(board.BUTTON_DOWN)
-DOWN_BUTTON.direction = Direction.INPUT
-DOWN_BUTTON.pull = Pull.UP
-DOWN_BUTTON_START_STATE = DOWN_BUTTON.value
-
-logged_gc("Debouncer")
 
 
 def reverseString(s):
@@ -52,20 +33,6 @@ class CellGrid:
         first_run = True
         while True:
 
-            if UP_BUTTON.value != UP_BUTTON_START_STATE:
-                print("UP Button Pressed.")
-                if self.board.clock_enabled:
-                    print("Disabling Clock.")
-                    self.board.disable_clock()
-                else:
-                    print("Enabling Clock.")
-                    self.board.enable_clock()
-
-            if DOWN_BUTTON.value != DOWN_BUTTON_START_STATE:
-                print("DOWN Button Pressed.")
-                print(f"Leaving game after {generations} generations.")
-                return
-
             new_text = self.board.get_time_string()
             if new_text != old_text:
                 print(f"Updating time: {new_text}")
@@ -79,7 +46,7 @@ class CellGrid:
 
                     # Leave this game to start another.
                     if not self.run_forever and last_digits % self.leave_after == 0:
-                        print("Leaving Game.")
+                        print(f"Leaving Game after {generations} generations.")
                         return
 
                     # Reset the board.
@@ -88,11 +55,21 @@ class CellGrid:
                         self.reset(self.board.b1)
                         generations = 0
 
+            if not self.board.process_inputs():
+                print(f"Leaving Game after {generations} generations.")
+                return
+
             self.board.display.root_group = self.board.g1
             self.apply_life_rule(self.board.b1, self.board.b2)
+            generations += 1
+
+            if not self.board.process_inputs():
+                print(f"Leaving Game after {generations} generations.")
+                return
+
             self.board.display.root_group = self.board.g2
             res = self.apply_life_rule(self.board.b2, self.board.b1)
-            generations += 2
+            generations += 1
 
             if not res:
                 print(f"Game has ended after {generations} generations.")
@@ -165,6 +142,7 @@ class CellGrid:
 class CellLine(CellGrid):
 
     current_color = None
+    reset_on_full = True
 
     @gc_decorator
     def apply_life_rule(self, old, new):
@@ -184,8 +162,12 @@ class CellLine(CellGrid):
                 new[x + yyy] = old[x + ym1]
                 if new[x + yyy] > 0:
                     cell_count += 1
+                    has_cells = True
 
-        return has_cells and cell_count < (grid_size - width)
+        if self.reset_on_full and cell_count == (grid_size - width):
+            return False
+
+        return has_cells
 
     @gc_decorator
     def reset(self, output):
@@ -247,7 +229,6 @@ class CellRules(CellLine):
         return has_cells
 
     def reset(self, output):
-        self.board.reset_palette()
         binary_rule = "{0:08b}".format(self.rule_number)
         self.rule_flipped = reverseString(binary_rule)
         super().reset(output)
@@ -287,7 +268,6 @@ class CellTotalistic(CellLine):
         return has_cells
 
     def reset(self, output):
-        # reset_palette(self.board.palette, self.num_colors)
         self.board.reset_palette(8)
         self.board.clear_background()
         self.rule = self.convert_code_to_ruleset(self.code, self.num_colors)

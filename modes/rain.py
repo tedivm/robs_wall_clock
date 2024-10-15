@@ -7,6 +7,8 @@ from utils.palette import BLACK, WHITE
 
 class Rain(CellLine):
 
+    reset_on_full = False
+
     def first_row(self, old, new):
         y = 0
         has_cells = False
@@ -32,18 +34,17 @@ class Rain(CellLine):
     @gc_decorator
     def reset(self, output):
         print("Rain reset")
-
+        self.board.reset_palette()
         random_value = random.random()
-        self.random_grid_density = random.randint(22, 66) / 100
+        self.random_grid_density = random.randint(5, 66) / 100
         if random_value <= 0.20:
             self.mode = "one"
             self.color = random.randint(1, self.board.max_colors - 1)
         elif random_value <= 0.60:
             self.mode = "random"
-            self.board.reset_palette()
+
         else:
             self.mode = "spectrum"
-            self.board.reset_palette()
             self.current_color = random.randint(1, self.board.max_colors - 1)
 
         if self.mode == "random" or self.mode == "spectrum":

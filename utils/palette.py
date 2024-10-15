@@ -64,8 +64,10 @@ def interpolate(color_a, color_b, t):
 
 
 def dim_color(color, factor):
-    if factor > 0.8:
-        raise ValueError("Factor must be less than or equal to 0.8")
+    if factor > 1.0:
+        raise ValueError("Factor must be less than or equal to 1.0")
+    if factor >= 0.95:
+        return color
     if factor < 0.0:
         raise ValueError("Factor must be greater than or equal to 0.0")
     if factor <= 0.01:

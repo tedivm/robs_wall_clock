@@ -39,10 +39,10 @@ class InternetTime:
         try:
             if not hasattr(self, "_last_update_attempt"):
                 self._update_time_data_rate_limited()
-
-            now = _timestruct_to_seconds(rtc.RTC().datetime)
-            if now - self._last_update_attempt > self.seconds_between_updates:
-                self._update_time_data_rate_limited()
+            else:
+                now = _timestruct_to_seconds(rtc.RTC().datetime)
+                if now - self._last_update_attempt > self.seconds_between_updates:
+                    self._update_time_data_rate_limited()
         except Exception as e:
             print(e)
             print("InternetTime: Could not update system time")
@@ -91,6 +91,10 @@ class InternetTime:
         self._last_successful_update = now
 
     def _update_time_data(self):
+        if self.disable_internet:
+            if self.debug:
+                print("InternetTime: Internet time updates are disabled.")
+            return False
         if self.debug:
             print("InternetTime: Fetching new time from server.")
 
