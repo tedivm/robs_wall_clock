@@ -9,7 +9,6 @@ class ColorHighLife(CellGrid):
     # https://conwaylife.com/wiki/OCA:HighLife
 
     random_grid_density = 0.15
-    reset_every = 5
 
     # Function adapted from https://github.com/adafruit/Adafruit_Learning_System_Guides/blob/main/CircuitPython_RGBMatrix/life/code.py
     @gc_decorator

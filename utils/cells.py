@@ -18,7 +18,7 @@ class CellGrid:
     text_color = WHITE
     random_grid_density = 0.33
     reset_every = 1
-    leave_after = 5
+    leave_after = 1
 
     def __init__(self, gameboard, run_forever=False):
         self.run_forever = run_forever
@@ -281,8 +281,8 @@ class CellTotalistic(CellLine):
 class CellCreep(CellGrid):
     reset_every = 5
     creeps = []
-    min_creeps = 5
-    max_creeps = 20
+    min_creeps = 1
+    max_creeps = 15
     toggle_clock = False
 
     density_count = []
@@ -327,6 +327,24 @@ class CellCreep(CellGrid):
         self.board.clear_background()
         self.board.set_clock_color(WHITE)
         self.creeps = []
+        self.place_creeps(output)
+
+    def place_creeps(self, output):
+
+        # Heavy bias towards 2 creeps, as it has the prettiest output.
+        if random.random() < 0.4:
+            creep_count = 2
+        else:
+            # Note that this also has a chance to be 2.
+            creep_count = random.randint(self.min_creeps, self.max_creeps)
+
+        if creep_count == 1:
+            creep = self.new_creep(output)
+            creep["x"] = output.width // 2
+            creep["y"] = output.height // 2
+            self.creeps.append(creep)
+            return
+
         for i in range(random.randint(self.min_creeps, self.max_creeps)):
             self.creeps.append(self.new_creep(output))
 

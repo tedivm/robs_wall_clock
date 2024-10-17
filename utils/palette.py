@@ -34,12 +34,24 @@ def reset_palette(palette, max_colors=None, brightness=1):
 
     chunks = 255 // max_colors
     palette[0] = BLACK
-    print(f"Regenerating Palette with brightness {brightness}.")
+
     random_offset = random.randint(0, 255)
+    reverse = random.random() < 0.5
+
+    print(f"Regenerating Palette with brightness {brightness} and offset {random_offset}.")
+    if reverse:
+        print("Reversing spectrum.")
+
     for i in range(1, max_colors):
         offset = i * chunks
-        palette[i] = dim_color(colorwheel(offset + random_offset), dimness)
-        print(f"Color {i}: {palette[i]}, offset: {offset}")
+
+        if reverse:
+            index = -i % max_colors
+        else:
+            index = i
+
+        palette[index] = dim_color(colorwheel(offset + random_offset), dimness)
+        print(f"Color {index}: {palette[index]}, offset: {offset}")
 
 
 def randomize_palette(palette):

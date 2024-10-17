@@ -10,6 +10,7 @@ import board
 import network
 from modes import (
     ant,
+    ant_dance,
     highlife_colors,
     life_colors,
     life_simple,
@@ -58,6 +59,7 @@ GAMEBOARD = GameBoard(
 RANDOM_EXCLUDE_MODES = ["rule30"]
 MODES = {
     "ant": ant,
+    "ant_dance": ant_dance,
     "highlife_colors": highlife_colors,
     "life_colors": life_colors,
     "life_simple": life_simple,

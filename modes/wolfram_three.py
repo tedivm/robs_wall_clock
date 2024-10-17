@@ -4,8 +4,8 @@ from utils.cells import CellTotalistic
 
 
 class WolframThree(CellTotalistic):
-    rules_single = [357, 420, 600, 777, 946, 948, 966, 1599, 1635, 1884]
-    rules_multiple = [357, 420, 600, 777, 1599]
+    rules_single = [357, 420, 600, 777, 946, 948, 1599, 1635, 1884]
+    rules_multiple = [357, 420, 600, 777, 966, 1599]
 
     def reset(self, output):
         if random.random() < 0.50:

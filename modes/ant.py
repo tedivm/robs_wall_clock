@@ -12,10 +12,11 @@ DIRECTION_WEST = 3
 # https://en.wikipedia.org/wiki/Langton%27s_ant
 class Ant(CellCreep):
     reset_every = 5
+    leave_after = 5
 
     creeps = []
-    min_creeps = 5
-    max_creeps = 32
+    min_creeps = 1
+    max_creeps = 5
 
     fun_rules = [
         "RLR",

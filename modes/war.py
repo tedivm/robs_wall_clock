@@ -10,6 +10,7 @@ class War(CellGrid):
     text_color = BLACK
     random_grid_density = 1
     reset_every = 5
+    leave_after = 5
 
     # Algorithm adapted from https://www.reddit.com/r/cellular_automata/comments/1bmicq6/a_simple_cellular_automaton_that_simulates_war/
     # Function adapted from https://github.com/adafruit/Adafruit_Learning_System_Guides/blob/main/CircuitPython_RGBMatrix/life/code.py
